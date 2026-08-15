@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AstraNumerics — Cosmic Astrology & Numerology Blueprint</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg?v=3">
+    <link rel="icon" type="image/png" href="favicon.png?v=3">
+    <link rel="shortcut icon" type="image/x-icon" href="favicon.ico?v=3">
+    <link rel="apple-touch-icon" href="favicon.png?v=3">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css?v=4.0">
+    <!-- html2pdf.js Library for Client-Side PDF Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</head>
+<body>
+    <!-- Ambient Background Starfield & Nebula -->
+    <div class="stars-bg"></div>
+    <div class="nebula-bg"></div>
+
+    <div class="app-container">
+        <!-- Header & Branding -->
+        <header class="main-header">
+            <div class="brand-logo">
+                <span class="logo-icon">✨</span>
+                <h1>AstraNumerics</h1>
+            </div>
+            <p class="tagline">High-Precision Astronomical Ephemeris & Sacred Numerology Engine</p>
+        </header>
+
+        <!-- Input Form Panel -->
+        <section class="glass-panel profile-form-section">
+            <h2 class="section-title">🔮 Enter Birth Details</h2>
+            <form id="profile-form" class="profile-grid">
+                <div class="form-group">
+                    <label for="full_name">Full Birth Name</label>
+                    <input type="text" id="full_name" required value="Celeste Vance" placeholder="e.g. Celeste Vance">
+                </div>
+
+                <div class="form-group">
+                    <label for="birth_date">Date of Birth</label>
+                    <input type="date" id="birth_date" required value="1996-07-24">
+                </div>
+
+                <div class="form-group">
+                    <label for="birth_time">Time of Birth (UTC)</label>
+                    <input type="time" id="birth_time" required value="14:30">
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">Gender (for Kua Number)</label>
+                    <select id="gender">
+                        <option value="female" selected>Female</option>
+                        <option value="male">Male</option>
+                    </select>
+                </div>
+
+                <div class="form-group location-group">
+                    <label for="city_search">Birth Location (City Search or GPS)</label>
+                    <div class="location-input-wrapper">
+                        <input type="text" id="city_search" value="New York, USA" placeholder="Type city name (e.g. Paris, Dubai, Mumbai)..." autocomplete="off">
+                        <button type="button" id="btn-geo" class="geo-btn" title="Use My Current GPS Location">📍 GPS</button>
+                    </div>
+                    <div id="city-suggestions" class="city-suggestions-dropdown"></div>
+                    <input type="hidden" id="latitude_val" value="40.7128">
+                    <input type="hidden" id="longitude_val" value="-74.0060">
+                    <small id="coord-badge" class="coord-badge">Coords: 40.71° N, 74.01° W</small>
+                </div>
+
+                <div class="form-group submit-btn-group" style="grid-column: 1 / -1; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap;">
+                        <button type="submit" id="btn-generate" class="glow-btn">
+                            <span>✨ Generate Cosmic Blueprint</span>
+                        </button>
+                        <button type="button" id="btn-download-pdf" class="glow-btn" disabled style="background: linear-gradient(135deg, #0284c7, #38bdf8); border-color: #38bdf8; opacity: 0.45; cursor: not-allowed;" title="Complete all 3 steps below to unlock PDF generation.">
+                            <span id="pdf-btn-text">🔒 Download PDF Report (0/3 Steps)</span>
+                        </button>
+                    </div>
+
+                    <!-- PDF Report Activation Checklist -->
+                    <div id="pdf-unlock-checklist" style="display: flex; gap: 1rem; flex-wrap: wrap; background: rgba(15, 23, 42, 0.6); padding: 0.6rem 1rem; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.8rem; color: var(--text-muted);">
+                        <span id="chk-profile">⚪ Step 1: Birth Profile Computed</span>
+                        <span id="chk-mobile">⚪ Step 2: Mobile Numbers Analyzed</span>
+                        <span id="chk-synastry">⚪ Step 3: Tab 5 Synastry Match Computed</span>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Main Workspace Tabs -->
+        <main class="workspace-section">
+            <nav class="tab-navigation">
+                <button class="tab-btn active" data-tab="astrology-tab">🌌 Natal Chart Wheel</button>
+                <button class="tab-btn" data-tab="numerology-tab">🔢 Sacred Numerology</button>
+                <button class="tab-btn" data-tab="career-tab">💼 Profession Predictions</button>
+                <button class="tab-btn" data-tab="pinnacles-tab">🏔️ Pinnacles & Life Cycles</button>
+                <button class="tab-btn" data-tab="synastry-tab">💖 Synastry Matcher</button>
+                <button class="tab-btn" data-tab="horoscope-tab">🌟 Daily Forecast</button>
+            </nav>
+
+            <!-- TAB 1: ASTROLOGY NATAL WHEEL -->
+            <section id="astrology-tab" class="tab-content active">
+                <div class="astrology-layout">
+                    <!-- Left: Interactive SVG Wheel -->
+                    <div class="glass-panel natal-wheel-card">
+                        <div class="wheel-header">
+                            <h3>Interactive 360° Natal Wheel</h3>
+                            <span class="badge" id="chart-badge">Whole Sign System</span>
+                        </div>
+                        <div id="svg-wheel-container" class="svg-container">
+                            <div class="placeholder-msg">Submit birth details above to render your natal wheel</div>
+                        </div>
+                    </div>
+
+                    <!-- Right: Key Placements & Aspects -->
+                    <div class="astrology-details-column">
+                        <div class="glass-panel trio-card">
+                            <h3>Big Three Placements</h3>
+                            <div class="trio-grid">
+                                <div class="trio-item">
+                                    <span class="trio-icon">☉</span>
+                                    <div class="trio-info">
+                                        <label>Sun Sign</label>
+                                        <span id="sun-sign-val" class="trio-value">--</span>
+                                    </div>
+                                </div>
+                                <div class="trio-item">
+                                    <span class="trio-icon">☽</span>
+                                    <div class="trio-info">
+                                        <label>Moon Sign</label>
+                                        <span id="moon-sign-val" class="trio-value">--</span>
+                                    </div>
+                                </div>
+                                <div class="trio-item">
+                                    <span class="trio-icon">ASC</span>
+                                    <div class="trio-info">
+                                        <label>Rising (ASC)</label>
+                                        <span id="asc-sign-val" class="trio-value">--</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="glass-panel elements-card">
+                            <h3>Elemental & Modality Balance</h3>
+                            <div class="balance-grid" id="elements-grid">
+                                <!-- Dynamic Element Bars -->
+                            </div>
+                            <div class="balance-grid" id="modalities-grid" style="margin-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.08); padding-top: 0.75rem;">
+                                <!-- Dynamic Modality Bars -->
+                            </div>
+                        </div>
+
+                        <div class="glass-panel planets-table-card">
+                            <h3>Planetary Longitudes & House Placements</h3>
+                            <div class="table-scroll">
+                                <table class="cosmic-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Body</th>
+                                            <th>Sign</th>
+                                            <th>Position</th>
+                                            <th>House</th>
+                                            <th>Element</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="planets-table-body">
+                                        <tr><td colspan="5" class="text-center">No data generated yet</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Exhaustive 12 Astrological Houses Analysis Table -->
+                <div class="glass-panel" style="margin-top: 1.5rem;">
+                    <div style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                        <h3 style="color: var(--accent-cyan); font-family: var(--font-heading);">🏠 Complete 12 Astrological Houses & Life Domains Analysis</h3>
+                        <p class="tagline">Explore your 12 life houses, sign cusps, resident planets, and core life domains. Click any row for in-depth analysis.</p>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="cosmic-table">
+                            <thead>
+                                <tr>
+                                    <th>House</th>
+                                    <th>Zodiac Cusp</th>
+                                    <th>House Name & Domain</th>
+                                    <th>Resident Planets</th>
+                                    <th>Key Life Influence</th>
+                                </tr>
+                            </thead>
+                            <tbody id="houses-table-body">
+                                <tr><td colspan="5" class="text-center">No house data generated yet</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Exhaustive Inter-Planetary Aspects Table -->
+                <div class="glass-panel" style="margin-top: 1.5rem;">
+                    <div style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                        <h3 style="color: var(--accent-cyan); font-family: var(--font-heading);">⚡ Major Inter-Planetary Aspects & Cosmic Conversations</h3>
+                        <p class="tagline">Inter-planetary angles shaping your talent, drive, internal harmony, and growth challenges.</p>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="cosmic-table">
+                            <thead>
+                                <tr>
+                                    <th>Planetary Pair</th>
+                                    <th>Aspect Type</th>
+                                    <th>Exact Angle (Orb)</th>
+                                    <th>Nature</th>
+                                    <th>Cosmic Guidance</th>
+                                </tr>
+                            </thead>
+                            <tbody id="aspects-table-body">
+                                <tr><td colspan="5" class="text-center">No aspect data generated yet</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: NUMEROLOGY BLUEPRINT -->
+            <section id="numerology-tab" class="tab-content">
+                <div class="numerology-layout">
+                    <!-- Lo Shu Grid Sacred 3x3 Matrix -->
+                    <div class="glass-panel loshu-container">
+                        <div class="loshu-header">
+                            <h3>☯️ Sacred Lo Shu Grid (3x3 Energy Matrix)</h3>
+                            <div class="driver-conductor-badges">
+                                <span class="badge driver-badge">Driver (Psychic): <strong id="driver-num-val">--</strong></span>
+                                <span class="badge conductor-badge">Conductor (Destiny): <strong id="conductor-num-val">--</strong></span>
+                                <span class="badge kua-badge">Kua Number: <strong id="kua-num-val">--</strong></span>
+                            </div>
+                        </div>
+
+                        <div class="dual-grid-section">
+                            <div class="grid-card-box">
+                                <h4>Pure DOB Grid (Basic Digits Only)</h4>
+                                <div class="loshu-grid-3x3" id="pure-loshu-grid-box"></div>
+                            </div>
+                            <div class="grid-card-box">
+                                <h4>Full Vedic Grid (DOB + Driver + Conductor + Kua)</h4>
+                                <div class="loshu-grid-3x3" id="loshu-grid-box"></div>
+                            </div>
+                        </div>
+
+                        <div class="loshu-grid-wrapper" style="margin-top: 1.5rem;">
+                            <div class="loshu-planes-summary" style="grid-column: 1 / -1;">
+                                <h4>Planes & Yogas Alignment (Vedic Analysis)</h4>
+                                <div id="loshu-planes-list" class="planes-list">
+                                    <!-- Dynamic Yogas -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Missing Numbers & Remedies -->
+                        <div class="missing-remedies-section">
+                            <h4>💡 Missing Number Elemental Remedies</h4>
+                            <div id="missing-remedies-grid" class="remedies-grid">
+                                <!-- Dynamic Missing Number Remedies -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Core Numbers Overview Header & System Switcher -->
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; margin-bottom: 1rem; flex-wrap: wrap; gap: 1rem;">
+                        <h3 style="color: var(--accent-cyan); font-family: var(--font-heading); margin: 0;">🔯 Core Name & Destiny Numbers Overview</h3>
+                        <div class="system-toggle-group" style="display: flex; gap: 0.5rem; background: rgba(15, 23, 42, 0.8); padding: 0.25rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1);">
+                            <button type="button" id="btn-sys-chaldean" class="tab-btn active" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;" onclick="switchNumerologySystem('chaldean')">
+                                🔯 Chaldean Method (Primary)
+                            </button>
+                            <button type="button" id="btn-sys-pythagorean" class="tab-btn" style="padding: 0.4rem 0.85rem; font-size: 0.85rem;" onclick="switchNumerologySystem('pythagorean')">
+                                📐 Pythagorean Method
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Core Numbers Overview Grid -->
+                    <div class="numbers-overview-grid" id="numerology-core-grid">
+                        <!-- Dynamic Core Cards -->
+                    </div>
+
+                    <!-- Comparison Table: Pythagorean vs Chaldean -->
+                    <div class="glass-panel comparison-section">
+                        <h3>Pythagorean vs. Chaldean System Matrix</h3>
+                        <div class="system-comparison-grid" id="system-matrix">
+                            <!-- Dynamic System Cards -->
+                        </div>
+                    </div>
+
+                    <!-- In-Depth Name Analysis & Spelling Correction Recommendations -->
+                    <div class="glass-panel name-spelling-section" style="margin-top: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                            <div>
+                                <h3 style="color: var(--accent-cyan); font-family: var(--font-heading);">✍️ Name Numerology & Spelling Correction Recommendations</h3>
+                                <p class="tagline">Detailed analysis of name vibration and recommended spelling modifications for wealth & career harmony.</p>
+                            </div>
+                            <span id="name-harmony-badge" class="synastry-title-badge" style="font-size: 0.85rem; padding: 0.25rem 0.75rem;">🌟 Name Harmony</span>
+                        </div>
+                        <div id="name-spelling-grid" class="synastry-details-grid">
+                            <!-- Dynamic Recommended Name Variations -->
+                        </div>
+                    </div>
+
+                    <!-- 📱 4-Mobile Number Numerology & Compatibility Inspector -->
+                    <div class="glass-panel mobile-inspector-section" style="margin-top: 1.5rem;">
+                        <div style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 0.75rem; margin-bottom: 1.25rem;">
+                            <h3 style="color: var(--accent-cyan); font-family: var(--font-heading);">📱 4-Mobile Number Numerology & Compatibility Inspector</h3>
+                            <p class="tagline">Analyze up to 4 mobile numbers simultaneously to find your ultimate wealth, power, and luck vibration.</p>
+                        </div>
+
+                        <!-- 4 Mobile Number Inputs Bar -->
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                            <div class="form-group">
+                                <label for="mobile_1">Mobile #1</label>
+                                <input type="text" id="mobile_1" value="9876543210" placeholder="e.g. 9876543210">
+                            </div>
+                            <div class="form-group">
+                                <label for="mobile_2">Mobile #2</label>
+                                <input type="text" id="mobile_2" value="9123456789" placeholder="e.g. 9123456789">
+                            </div>
+                            <div class="form-group">
+                                <label for="mobile_3">Mobile #3 (Optional)</label>
+                                <input type="text" id="mobile_3" value="8888555512" placeholder="e.g. 8888555512">
+                            </div>
+                            <div class="form-group">
+                                <label for="mobile_4">Mobile #4 (Optional)</label>
+                                <input type="text" id="mobile_4" value="7777111199" placeholder="e.g. 7777111199">
+                            </div>
+                        </div>
+
+                        <div style="text-align: center; margin-bottom: 1.25rem;">
+                            <button type="button" id="analyze-mobile-btn" class="glow-btn" style="padding: 0.6rem 1.75rem; font-size: 0.95rem;">📱 Analyze Mobile Numbers Now</button>
+                        </div>
+
+                        <!-- 4 Mobile Numbers Analysis Matrix -->
+                        <div id="mobile-analysis-grid" class="synastry-details-grid">
+                            <!-- Dynamic Mobile Number Analysis Cards -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: PROFESSION PREDICTIONS -->
+            <section id="career-tab" class="tab-content">
+                <div class="glass-panel career-container">
+                    <div class="synastry-header" style="border-bottom: 1px solid rgba(255, 255, 255, 0.08); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h3>💼 Vocation & Profession Predictions</h3>
+                                <p class="tagline">Astrological 10th House Midheaven & Numerology Lo Shu Career Alignment Matrix.</p>
+                            </div>
+                            <span id="career-title-badge" class="synastry-title-badge" style="font-size: 0.95rem; padding: 0.3rem 0.9rem;">🏆 Vocation Archetype</span>
+                        </div>
+                    </div>
+
+                    <!-- Business vs Employment Rating Card -->
+                    <div id="career-hero-card" class="synastry-hero-card" style="margin-bottom: 1.5rem;">
+                        <div class="score-circle-outer">
+                            <div class="score-circle">
+                                <span id="biz-rating-score" class="score-num">92%</span>
+                                <span class="score-lbl">Biz Fit</span>
+                            </div>
+                        </div>
+                        <h4 id="career-archetype-name" style="color: var(--accent-cyan); font-family: var(--font-heading); margin-top: 0.5rem; font-size: 1.3rem;">Strategic Visionary Leader</h4>
+                        <p id="biz-verdict-text" style="color: var(--text-main); font-size: 0.95rem; max-width: 800px; line-height: 1.5; margin-top: 0.5rem;">
+                            High commercial drive and executive ambition.
+                        </p>
+                    </div>
+
+                    <!-- Top Recommended Sectors Grid -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="color: var(--accent-cyan); font-family: var(--font-heading); margin-bottom: 1rem;">🚀 Top Recommended High-Success Career Sectors</h4>
+                        <div id="recommended-sectors-grid" class="synastry-details-grid">
+                            <!-- Dynamic Sector Cards -->
+                        </div>
+                    </div>
+
+                    <!-- Work Environment & Avoid Sectors Grid -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
+                        <div class="glass-panel" style="padding: 1.25rem;">
+                            <h4 style="color: var(--accent-cyan); font-family: var(--font-heading); margin-bottom: 0.5rem;">🎯 Ideal Work Environment & Leadership Style</h4>
+                            <p id="work-environment-text" style="color: var(--text-main); font-size: 0.9rem; line-height: 1.5;">Dynamic, goal-oriented environment with executive autonomy.</p>
+                        </div>
+                        <div class="glass-panel" style="padding: 1.25rem; border-color: rgba(248, 113, 113, 0.4);">
+                            <h4 style="color: #f87171; font-family: var(--font-heading); margin-bottom: 0.5rem;">⚠️ Career Sectors & Environments to Avoid</h4>
+                            <ul id="avoid-sectors-list" style="padding-left: 1.2rem; color: var(--text-muted); font-size: 0.9rem; line-height: 1.5;">
+                                <li>High-friction, micro-managed roles lacking growth prospects.</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Career Elevation & Feng Shui Remedies -->
+                    <div class="glass-panel" style="padding: 1.5rem; border-color: var(--border-highlight); background: rgba(15, 23, 42, 0.85);">
+                        <h4 style="color: var(--accent-cyan); font-family: var(--font-heading); margin-bottom: 0.75rem;">🌟 Actionable Career Elevation & Power Remedies</h4>
+                        <div id="career-remedies-content" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem;">
+                            <!-- Dynamic Career Remedies -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB: PINNACLES & LIFE CYCLES -->
+            <section id="pinnacles-tab" class="tab-content">
+                <div class="glass-panel pinnacles-container">
+                    <div class="pinnacles-header">
+                        <h3>🏔️ 4 Major Life Pinnacles & Challenge Cycles</h3>
+                        <p class="tagline">Map out your key lifetime phases, major growth peaks, and core personal challenges.</p>
+                    </div>
+
+                    <div id="pinnacles-timeline-grid" class="pinnacles-timeline-grid">
+                        <!-- Dynamic 4 Pinnacle Phase Cards -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: SYNASTRY COMPATIBILITY -->
+            <section id="synastry-tab" class="tab-content">
+                <div class="glass-panel synastry-panel">
+                    <div class="synastry-header">
+                        <h3>💖 Synastry & Cosmic Compatibility Matcher</h3>
+                        <p class="tagline">Explore deep elemental chemistry, life path synergy, and 4 pillars of relationship harmony.</p>
+                    </div>
+
+                    <form id="synastry-form" class="synastry-form-card">
+                        <div class="synastry-grid">
+                            <div class="person-box glass-panel">
+                                <h4>👤 Person 1</h4>
+                                <div class="form-group">
+                                    <label for="p1_name">Full Name</label>
+                                    <input type="text" id="p1_name" value="Celeste" placeholder="Person 1 Name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="p1_birth">Date of Birth</label>
+                                    <input type="date" id="p1_birth" value="1996-07-24">
+                                </div>
+                            </div>
+
+                            <div class="versus-divider">
+                                <span>⚡</span>
+                            </div>
+
+                            <div class="person-box glass-panel">
+                                <h4>👤 Person 2</h4>
+                                <div class="form-group">
+                                    <label for="p2_name">Full Name</label>
+                                    <input type="text" id="p2_name" value="Julian" placeholder="Person 2 Name">
+                                </div>
+                                <div class="form-group">
+                                    <label for="p2_birth">Date of Birth</label>
+                                    <input type="date" id="p2_birth" value="1994-11-12">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="synastry-submit">
+                            <button type="submit" class="glow-btn">✨ Calculate Synastry Compatibility</button>
+                        </div>
+                    </form>
+
+                    <div id="synastry-results" class="synastry-results-area">
+                        <!-- Dynamic Comprehensive Synastry Results -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 4: DAILY FORECAST -->
+            <section id="horoscope-tab" class="tab-content">
+                <div class="glass-panel horoscope-panel">
+                    <h3>🌟 Daily Transit & Cosmic Guidance</h3>
+                    <div class="horoscope-content" id="daily-horoscope-area">
+                        <div class="vibe-card">
+                            <h4>Current Transit Alignment</h4>
+                            <p id="cosmic-vibe-text">Loading daily transit alignment...</p>
+                        </div>
+                        <div class="meta-row">
+                            <div class="meta-item">
+                                <label>Lucky Numbers</label>
+                                <span id="lucky-nums-val">3, 7, 11, 21</span>
+                            </div>
+                            <div class="meta-item">
+                                <label>Power Color</label>
+                                <span id="power-color-val">Cosmic Gold (#ffd700)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- App Footer & Copyright -->
+        <footer class="app-footer glass-panel">
+            <div class="footer-brand-banner">
+                <div class="footer-logo">
+                    <span class="logo-icon">✨</span>
+                    <span class="logo-title">AstroVedic Cosmic Engine</span>
+                </div>
+                <p class="footer-desc">
+                    High-precision ephemeris natal chart calculations, sacred Lo Shu grid energy matrix, Pythagorean & Chaldean numerology, Synastry compatibility matcher, Name Correction, Mobile Inspector, and Vocation predictions.
+                </p>
+                <div class="footer-badges">
+                    <span class="synastry-title-badge" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">v2.5.0 Premium Edition</span>
+                    <span class="synastry-title-badge" style="font-size: 0.75rem; padding: 0.2rem 0.6rem;">🔒 100% Confidential & Secure</span>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p>© 2026 AstroVedic Cosmic Engine. All Rights Reserved.</p>
+                <p class="disclaimer-text">
+                    <strong>Disclaimer:</strong> Astrological and numerological calculations provide spiritual guidance, personal growth insights, and self-awareness tools. All calculations are generated for educational and personal empowerment purposes.
+                </p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Lo Shu Cell Interactive Detail Modal -->
+    <div id="loshu-cell-modal" class="modal-overlay">
+        <div class="glass-panel modal-card">
+            <div class="modal-header">
+                <h3 id="modal-cell-title">Number Details</h3>
+                <button id="modal-close-btn" class="modal-close-btn">&times;</button>
+            </div>
+            <div class="modal-body" id="modal-cell-body">
+                <!-- Dynamic cell implications -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Application JavaScript Engine -->
+    <script src="natal-wheel.js?v=5.0"></script>
+    <script src="pdf-generator.js?v=5.0"></script>
+    <script src="app.js?v=5.0"></script>
+</body>
+</html>
