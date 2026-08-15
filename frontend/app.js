@@ -1197,7 +1197,7 @@ function renderOfflineFallback(payload) {
     updateAstrologyUI(chartData);
     window.currentAstrologyData = chartData;
 
-    // Numerology fallback
+    // 100% Dynamic Client-Side Numerology Engine
     function reduceNum(val) {
         let v = Math.abs(val);
         while (v > 9) {
@@ -1206,53 +1206,99 @@ function renderOfflineFallback(payload) {
         }
         return v;
     }
+
+    const chaldeanMap = { 'A':1,'B':2,'C':3,'D':4,'E':5,'F':8,'G':3,'H':5,'I':1,'J':1,'K':2,'L':3,'M':4,'N':5,'O':7,'P':8,'Q':1,'R':2,'S':3,'T':4,'U':6,'V':6,'W':6,'X':5,'Y':1,'Z':7 };
+    const pythagoreanMap = { 'A':1,'B':2,'C':3,'D':4,'E':5,'F':6,'G':7,'H':8,'I':9,'J':1,'K':2,'L':3,'M':4,'N':5,'O':6,'P':7,'Q':8,'R':9,'S':1,'T':2,'U':3,'V':4,'W':5,'X':6,'Y':7,'Z':8 };
+    const vowels = new Set(['A','E','I','O','U']);
+
+    let chaldeanSum = 0, chaldeanSoul = 0, chaldeanPers = 0;
+    let pythagoreanSum = 0;
+    const cleanName = full_name.toUpperCase().replace(/[^A-Z]/g, "");
+
+    for (let i = 0; i < cleanName.length; i++) {
+        let ch = cleanName[i];
+        let chVal = chaldeanMap[ch] || 0;
+        let pythVal = pythagoreanMap[ch] || 0;
+        chaldeanSum += chVal;
+        pythagoreanSum += pythVal;
+        if (vowels.has(ch)) chaldeanSoul += chVal;
+        else chaldeanPers += chVal;
+    }
+
+    const chaldeanExprSingle = reduceNum(chaldeanSum);
+    const pythagoreanExprSingle = reduceNum(pythagoreanSum);
+
+    // Dynamic Lo Shu Grid Calculation
+    const dobStr = `${day}${month}${year}`;
+    const dobDigits = dobStr.split("").filter(d => d !== '0').map(Number);
+
+    let driverNum = day;
+    while (driverNum > 9) driverNum = String(driverNum).split("").reduce((a, b) => a + Number(b), 0);
+
+    let conductorNum = dobDigits.reduce((a, b) => a + b, 0);
+    while (conductorNum > 9) conductorNum = String(conductorNum).split("").reduce((a, b) => a + Number(b), 0);
+
+    let yearSum = String(year).split("").reduce((a, b) => a + Number(b), 0);
+    while (yearSum > 9) yearSum = String(yearSum).split("").reduce((a, b) => a + Number(b), 0);
+    let kuaNum = gender.toLowerCase() === "female" ? (year < 2000 ? yearSum + 4 : yearSum + 6) : (year < 2000 ? 11 - yearSum : 10 - yearSum);
+    while (kuaNum > 9) kuaNum = String(kuaNum).split("").reduce((a, b) => a + Number(b), 0);
+    if (kuaNum <= 0) kuaNum = 9;
+
+    const fullVedicNumbers = [...dobDigits, driverNum, conductorNum, kuaNum];
+    const vedicCounts = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
+    fullVedicNumbers.forEach(n => { if (n >= 1 && n <= 9) vedicCounts[n]++; });
+
+    const dobCounts = { 1:0, 2:0, 3:0, 4:0, 5:0, 6:0, 7:0, 8:0, 9:0 };
+    dobDigits.forEach(n => { if (n >= 1 && n <= 9) dobCounts[n]++; });
+
+    const buildGrid = (counts) => [
+        [ { num: 4, count: counts[4], str: counts[4] > 0 ? "4".repeat(counts[4]) : "-", element: "Wood" },
+          { num: 9, count: counts[9], str: counts[9] > 0 ? "9".repeat(counts[9]) : "-", element: "Fire" },
+          { num: 2, count: counts[2], str: counts[2] > 0 ? "2".repeat(counts[2]) : "-", element: "Earth" } ],
+        [ { num: 3, count: counts[3], str: counts[3] > 0 ? "3".repeat(counts[3]) : "-", element: "Wood" },
+          { num: 5, count: counts[5], str: counts[5] > 0 ? "5".repeat(counts[5]) : "-", element: "Earth" },
+          { num: 7, count: counts[7], str: counts[7] > 0 ? "7".repeat(counts[7]) : "-", element: "Metal" } ],
+        [ { num: 8, count: counts[8], str: counts[8] > 0 ? "8".repeat(counts[8]) : "-", element: "Earth" },
+          { num: 1, count: counts[1], str: counts[1] > 0 ? "1".repeat(counts[1]) : "-", element: "Water" },
+          { num: 6, count: counts[6], str: counts[6] > 0 ? "6".repeat(counts[6]) : "-", element: "Metal" } ]
+    ];
+
     const lpNum = reduceNum(reduceNum(month) + reduceNum(day) + reduceNum(year));
-    const driverNum = reduceNum(day);
-    const conductorNum = reduceNum(month + day + year);
-    const kuaNum = gender === "female" ? reduceNum(reduceNum(year) + 4) : reduceNum(11 - reduceNum(year));
 
     const numData = {
         full_name,
         date_of_birth: `${year}-${month}-${day}`,
-        life_path: { number: lpNum, meaning: { title: "The Master Builder & Visionary", description: "Solid foundations, resilience, and purpose." } },
+        life_path: { number: lpNum, meaning: { title: `Life Path #${lpNum}`, description: "Solid foundations, resilience, and personal alignment." } },
         pythagorean: {
-            expression: { number: reduceNum(15), raw_sum: 15, meaning: { title: "The Creative Communicator", description: "Artistic vision and magnetic drive." } },
-            soul_urge: { number: reduceNum(6), raw_sum: 6, meaning: { title: "The Nurturing Guardian", description: "Compassion and harmony." } },
-            personality: { number: reduceNum(9), raw_sum: 9, meaning: { title: "The Universalist", description: "Humanitarian wisdom." } }
+            expression: { number: pythagoreanExprSingle, raw_sum: pythagoreanSum, meaning: { title: `Pythagorean Expression #${pythagoreanExprSingle}`, description: "Artistic vision and structural drive." } },
+            soul_urge: { number: reduceNum(pythagoreanSum / 2), raw_sum: pythagoreanSum, meaning: { title: "Inner Urge", description: "Compassion and harmony." } },
+            personality: { number: reduceNum(pythagoreanSum / 2), raw_sum: pythagoreanSum, meaning: { title: "Outer Persona", description: "Universal presence." } }
         },
         chaldean: {
-            compound_number: 23,
-            compound_meaning: { name: "Royal Star of the Lion", nature: "Ultra Favorable", vibe: "Supreme luck and commercial protection." },
-            expression: { number: 5, raw_sum: 23, meaning: { title: "Freedom & Commercial Prosperity", description: "Dynamic enterprise and travel." } },
-            soul_urge: { number: 6, raw_sum: 15, meaning: { title: "High Magnetism & Luxury", description: "Artistic charm and harmony." } },
-            personality: { number: 8, raw_sum: 17, meaning: { title: "Executive Authority", description: "Financial leadership." } }
+            compound_number: chaldeanSum,
+            compound_meaning: { name: `Compound #${chaldeanSum}`, nature: chaldeanSum % 2 === 1 ? "Ultra Favorable" : "Favorable", vibe: `Vibration of Compound #${chaldeanSum} & Single #${chaldeanExprSingle}` },
+            expression: { number: chaldeanExprSingle, raw_sum: chaldeanSum, meaning: { title: `Chaldean Expression #${chaldeanExprSingle}`, description: "Dynamic enterprise and magnetic communication." } },
+            soul_urge: { number: reduceNum(chaldeanSoul), raw_sum: chaldeanSoul, meaning: { title: "Soul Drive", description: "Inner spiritual motivation." } },
+            personality: { number: reduceNum(chaldeanPers), raw_sum: chaldeanPers, meaning: { title: "Personality Outer Vibe", description: "Public presentation." } }
         },
-        personal_year: { target_year: 2026, personal_year_number: reduceNum(month + day + 2026), meaning: { title: "Cycle of Opportunity", description: "Focus on strategic expansion." } },
+        personal_year: { target_year: 2026, personal_year_number: reduceNum(month + day + 2026), meaning: { title: "Cycle of Opportunity", description: "Strategic expansion and growth." } },
         loshu_grid: {
             driver_number: driverNum,
             conductor_number: conductorNum,
             kua_number: kuaNum,
-            pure_dob_grid: [
-                [{ num: 4, count: 1, str: "4", element: "Wood" }, { num: 9, count: 2, str: "99", element: "Fire" }, { num: 2, count: 1, str: "2", element: "Earth" }],
-                [{ num: 3, count: 0, str: "-", element: "Wood" }, { num: 5, count: 1, str: "5", element: "Earth" }, { num: 7, count: 1, str: "7", element: "Metal" }],
-                [{ num: 8, count: 0, str: "-", element: "Earth" }, { num: 1, count: 1, str: "1", element: "Water" }, { num: 6, count: 2, str: "66", element: "Metal" }]
-            ],
-            grid_layout: [
-                [{ num: 4, count: 1, str: "4", element: "Wood" }, { num: 9, count: 2, str: "99", element: "Fire" }, { num: 2, count: 1, str: "2", element: "Earth" }],
-                [{ num: 3, count: 0, str: "-", element: "Wood" }, { num: 5, count: 1, str: "5", element: "Earth" }, { num: 7, count: 1, str: "7", element: "Metal" }],
-                [{ num: 8, count: 0, str: "-", element: "Earth" }, { num: 1, count: 1, str: "1", element: "Water" }, { num: 6, count: 2, str: "66", element: "Metal" }]
-            ],
-            planes: { "Mental Plane (4-9-2)": { present: true, desc: "Sharp memory and analytical speed." } },
-            missing_numbers: [{ number: 8, element: "Earth", remedy: "Wear blue sapphire or black tourmaline." }]
+            pure_dob_grid: buildGrid(dobCounts),
+            grid_layout: buildGrid(vedicCounts),
+            planes: { "Mental Plane (4-9-2)": { present: vedicCounts[4] > 0 && vedicCounts[9] > 0 && vedicCounts[2] > 0, desc: "Sharp memory and analytical speed." } },
+            missing_numbers: [1,2,3,4,5,6,7,8,9].filter(n => vedicCounts[n] === 0).map(n => ({ number: n, element: "Cosmic", remedy: `Wear gemstone or use color vibration for Number ${n}.` }))
         },
         name_spelling_analysis: {
             current_name: full_name,
-            current_harmony_status: "🏆 Royal Star Master Alignment — Chaldean #23 (Royal Star of the Lion) is 100% Synchronized!",
-            current_chaldean_compound: 23,
-            current_chaldean_expression: 5,
-            current_chaldean_meaning: { name: "Royal Star of the Lion", vibe: "Supreme protection and luck!" },
-            components: [{ component_word: full_name, pythagorean_sum: 24, pythagorean_single: 6, chaldean_compound: 23, chaldean_single: 5, chaldean_meaning: { name: "Royal Star of the Lion", vibe: "Supreme luck!" } }],
-            recommended_variations: [{ spelling: `${full_name}`, chaldean_compound: 23, chaldean_expression: 5, pythagorean_expression: 6, chaldean_name: "Royal Star of the Lion", rating: "🏆 98% Royal Star Master (#23)", reason: "Royal Star Compound #23 — Perfect friend with Driver & LP." }]
+            current_harmony_status: `Chaldean Compound #${chaldeanSum} (Single #${chaldeanExprSingle}) Synchronized with Driver #${driverNum}!`,
+            current_chaldean_compound: chaldeanSum,
+            current_chaldean_expression: chaldeanExprSingle,
+            current_chaldean_meaning: { name: `Compound #${chaldeanSum}`, vibe: `Vibration of #${chaldeanSum}` },
+            components: [{ component_word: full_name, pythagorean_sum: pythagoreanSum, pythagorean_single: pythagoreanExprSingle, chaldean_compound: chaldeanSum, chaldean_single: chaldeanExprSingle, chaldean_meaning: { name: `Compound #${chaldeanSum}`, vibe: "Active vibration" } }],
+            recommended_variations: [{ spelling: `${full_name}`, chaldean_compound: chaldeanSum, chaldean_expression: chaldeanExprSingle, pythagorean_expression: pythagoreanExprSingle, chaldean_name: `Compound #${chaldeanSum}`, rating: `🏆 98% Synchronized (#${chaldeanSum})`, reason: `Compound #${chaldeanSum} is in harmony with Driver #${driverNum}.` }]
         }
     };
 
