@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+    <defs>
+        <!-- Background Radial Glow -->
+        <radialGradient id="bgGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#1e293b"/>
+            <stop offset="100%" stop-color="#0f172a"/>
+        </radialGradient>
+
+        <!-- Ice Cyan Glow -->
+        <radialGradient id="cyanGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#38bdf8" stop-opacity="1"/>
+            <stop offset="70%" stop-color="#0284c7" stop-opacity="0.8"/>
+            <stop offset="100%" stop-color="#0369a1" stop-opacity="0"/>
+        </radialGradient>
+
+        <!-- Gold Accent Gradient -->
+        <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#ffe58f"/>
+            <stop offset="50%" stop-color="#ffd700"/>
+            <stop offset="100%" stop-color="#d97706"/>
+        </linearGradient>
+    </defs>
+
+    <!-- Outer Rounded Base -->
+    <rect width="64" height="64" rx="16" fill="url(#bgGlow)" stroke="#38bdf8" stroke-width="1.5" stroke-opacity="0.5"/>
+
+    <!-- Orbital Ring 1 -->
+    <ellipse cx="32" cy="32" rx="24" ry="10" fill="none" stroke="url(#goldGrad)" stroke-width="1.2" opacity="0.8" transform="rotate(-30 32 32)"/>
+
+    <!-- Orbital Ring 2 -->
+    <ellipse cx="32" cy="32" rx="24" ry="10" fill="none" stroke="#38bdf8" stroke-width="1.2" opacity="0.6" transform="rotate(30 32 32)"/>
+
+    <!-- Central Glowing Star Sparkle -->
+    <g transform="translate(32 32)">
+        <!-- 4-Point Primary Star -->
+        <path d="M 0 -18 Q 0 0 18 0 Q 0 0 0 18 Q 0 0 -18 0 Q 0 0 0 -18 Z" fill="url(#goldGrad)"/>
+        <!-- 4-Point Secondary Diagonal Sparkle -->
+        <path d="M 0 -10 Q 0 0 10 0 Q 0 0 0 10 Q 0 0 -10 0 Q 0 0 0 -10 Z" fill="#ffffff" transform="rotate(45)"/>
+        <!-- Core Brightness -->
+        <circle cx="0" cy="0" r="3.5" fill="#ffffff"/>
+    </g>
+
+    <!-- Small Corner Celestial Dots -->
+    <circle cx="12" cy="14" r="1.2" fill="#38bdf8" opacity="0.9"/>
+    <circle cx="52" cy="14" r="1.5" fill="#ffd700" opacity="0.9"/>
+    <circle cx="14" cy="50" r="1.5" fill="#ffd700" opacity="0.9"/>
+    <circle cx="50" cy="50" r="1.2" fill="#38bdf8" opacity="0.9"/>
+</svg>
